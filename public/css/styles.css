@@ -32,7 +32,7 @@
 
 
 
-.child > span a{
+.child > span a, .child > span > .edit-element{
     position: relative;
     top:0.5rem;
     left:1.5rem;

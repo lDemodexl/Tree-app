@@ -32,7 +32,23 @@ class Trees extends Controller{
 		}else{
 			redirect('');
 		}
-	}	
+	}
+	
+	public function edit(){
+		if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
+            //Sanitize Post
+			$_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+			if( !empty($_POST) ){
+				if( $root = $this->treeModel->EditTreeElement($_POST) ){
+					return $this->createTree();	
+				}
+			}else{
+				redirect('');
+			}
+		}else{
+			redirect('');
+		}
+	}
 	
 	//Delete the element
 	public function delete(){

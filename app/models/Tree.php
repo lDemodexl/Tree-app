@@ -46,6 +46,20 @@ class Tree{
 
 	}
 
+	//Change tree element name
+	public function EditTreeElement($data){
+		$this->db->query('UPDATE tree SET name = :name WHERE id = :id');
+		$this->db->bind(':name', $data['name']);
+		$this->db->bind(':id', $data['id']);
+
+		//Execute
+		if( $this->db->execute() ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
 	//delete element from tree
 	public function deleteElement($id){
 		$this->db->query('DELETE FROM tree WHERE id = :id');

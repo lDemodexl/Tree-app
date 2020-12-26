@@ -77,6 +77,15 @@ function addChild(button){
     simple_ajax('trees/add' , 'post', {'createChild':id}, 'updateTree' );
 }
 
+function editElement(button){
+    var container = button.parentNode;
+    var input = container.querySelector('input');
+    var id = input.getAttribute('name');
+    var name = input.value;
+
+    simple_ajax('trees/edit' , 'post', {'id':id,'name':name}, 'updateTree' );
+}
+
 //check if root show confirmation else send request to delete element
 function deleteElement(button){
     var container = button.closest('li');
@@ -104,6 +113,23 @@ function confirmDeletion(){
 function createRoot(){
     simple_ajax('trees/add' , 'post', {'createRoot':true}, 'updateTree' );
 }
+
+function hideAllNameInputs(){
+    var show_data_elements = document.querySelectorAll('.show-element');
+    var edit_data_elements = document.querySelectorAll('.edit-element');
+    for(var i = 0; i<show_data_elements.length;i++){
+        show_data_elements[i].style.display = '';
+        edit_data_elements[i].style.display = 'none';
+    }
+}
+
+//show rename element input
+function toogleNameInput(id){
+    hideAllNameInputs();
+    document.getElementById('info_'+id).style.display = 'none';
+    document.getElementById('edit_'+id).style.display = '';
+}
+
 
 //on open/close dropdown resave coockie
 function saveDropdown(input){
@@ -139,19 +165,23 @@ function removeFromCoockie(id){
         opend_array = parseJson(decodeURIComponent(coockie));
     }
 
-    var container = document.getElementById('marker_'+id).parentNode;
-    var childs = container.querySelectorAll('input');
-
-    for( var i=0; i<childs.length; i++ ){
-        var index = opend_array.indexOf(childs[i].getAttribute('name'));
-
-        if( index !== -1 ){
-            opend_array.splice(index, 1);
-        }
+    var container = document.getElementById('marker_'+id);
+    if(!!container){
+        container = container.parentNode;
         
-    }
+        var childs = container.querySelectorAll('input[type=checkbox]');
 
-    document.cookie = 'dropdown='+encodeURIComponent(JSON.stringify(opend_array));
+        for( var i=0; i<childs.length; i++ ){
+            var index = opend_array.indexOf(childs[i].getAttribute('name'));
+
+            if( index !== -1 ){
+                opend_array.splice(index, 1);
+            }
+            
+        }
+
+        document.cookie = 'dropdown='+encodeURIComponent(JSON.stringify(opend_array));
+    }
 }
 
 //open dropdown when new element added to tree
@@ -180,7 +210,9 @@ function openDropdown(){
     }
 
     for( var i=0; i<opend_array.length; i++ ){
-        document.getElementById(opend_array[i]).checked = 'checked';
+        if(!!document.getElementById(opend_array[i])){
+            document.getElementById(opend_array[i]).checked = 'checked';
+        }
     }
 }
 
