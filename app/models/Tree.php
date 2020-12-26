@@ -7,13 +7,48 @@ class Tree{
 	}
 	
 	//get all records from  tree table
-	public function getTree(){
+	public function getAllTree(){
 		$this->db->query('SELECT *
 						FROM tree
 						ORDER BY tree.id ASC
 						');
 		
 		return $this->db->resultSetAll();
+	}
+	
+	//get root elements
+	function getTreeRoots(){
+		$this->db->query('SELECT * FROM tree WHERE parentID IS NULL ORDER BY tree.id ASC');
+
+		return $this->db->resultSetAll();
+	}
+
+	function getTreeElementById($id){
+		$this->db->query('SELECT * FROM tree WHERE id = :id');
+		$this->db->bind(':id', $id);
+
+		$this->db->execute();
+		if( $this->db->rowCount() > 0 ){
+			return $this->db->resultSetAll();
+		}else{
+			return false;
+		}
+		
+	}
+
+	//add root to tree
+	public function AddTree($data){
+		$this->db->query('INSERT INTO tree (name, parentID) VALUES (:name, :parentID)');
+		$this->db->bind(':name', $data['name']);
+		$this->db->bind(':parentID', NULL);
+
+		//Execute
+		if( $this->db->execute() ){
+			return $this->db->lastInsertId();
+		}else{
+			return false;
+		}
+
 	}
 
 	//add root to tree

@@ -6,6 +6,11 @@
     padding: 0.5rem;
 }
 
+.m-h-05{
+    margin-left:0.5rem;
+    margin-right:0.5rem;
+}
+
 .addChild, .removeElement{
     cursor:pointer;
 }
@@ -110,10 +115,10 @@ li.last {
     background:white;
 }
 
-input:checked + label::before{
+input[type=checkbox]:checked + label::before{
     content: "\f107";
 }
-input:checked ~ ul{
+input[type=checkbox]:checked ~ ul{
     display:inherit;
 }
 

@@ -1,4 +1,6 @@
-
+/*   ////////////////      */
+/*   Helper functions      */
+/*   ///////////////       */
 /*
     Function to parse json response. 
     if not json returns data back.
@@ -62,11 +64,37 @@ function simple_ajax(url, method, data, callback = ''){
     
 }
 
+/*  /////////////////    */
+/*  Action functions     */
+/*  ////////////////     */
+
+//Change curent tree
+function changeTree(select){
+    var treeID = select.value;
+    simple_ajax('' , 'post', {'treeID':treeID}, 'updateTree' );
+}
+
+//update tree selectbox
+function updateTreeSelect(data){
+    var container = document.getElementById('treeSelect-container');
+    container.innerHTML = data;
+}
+
 //replace old tree with new one
 function updateTree(data){
     var container = document.getElementById('tree-container');
     container.innerHTML = data;
     openDropdown();
+}
+
+//add new tree
+function addNewTree(){
+    createTreeModal.show(); 
+}
+
+//create root element on button click
+function createRoot(){
+    simple_ajax('trees/add' , 'post', {'createRoot':true}, 'updateTree' );
 }
 
 //add simple element
@@ -77,6 +105,7 @@ function addChild(button){
     simple_ajax('trees/add' , 'post', {'createChild':id}, 'updateTree' );
 }
 
+//edit element name from input
 function editElement(button){
     var container = button.parentNode;
     var input = container.querySelector('input');
@@ -84,6 +113,40 @@ function editElement(button){
     var name = input.value;
 
     simple_ajax('trees/edit' , 'post', {'id':id,'name':name}, 'updateTree' );
+}
+
+//create for submit
+function createFormSubmit(formID){
+    var form = document.getElementById(formID);
+    var inputs = form.querySelectorAll('input');
+
+    var formData = [];
+    for(var i = 0; i < inputs.length; i++){
+        var key = inputs[i].getAttribute('name');
+        var value = inputs[i].value;
+        formData[key] = value;
+    }
+    
+    createTreeModal.hide();
+    form.reset();
+    simple_ajax('trees/addTree' , 'post', formData, 'updateTree' );
+    simple_ajax('trees/getTreeSelect' , 'post', '', 'updateTreeSelect' );
+}
+
+//change element name from form
+function editFormSubmit(formID){
+    var form = document.getElementById(formID);
+    var inputs = form.querySelectorAll('input');
+
+    var formData = [];
+    for(var i = 0; i < inputs.length; i++){
+        var key = inputs[i].getAttribute('name');
+        var value = inputs[i].value;
+        formData[key] = value;
+    }
+    
+    renameModal.hide();
+    simple_ajax('trees/edit' , 'post', formData, 'updateTree' );
 }
 
 //check if root show confirmation else send request to delete element
@@ -94,24 +157,38 @@ function deleteElement(button){
     removeFromCoockie(id);
 
     if(container.classList.contains('root')){
-        myModal.show();
+        deleteModal.show();
         document.getElementById('deleteElementId').value = id;
     }else{
         simple_ajax('trees/delete' , 'post', {'id':id}, 'updateTree' );
     }
 }
 
+//delete all tree
+function deleteTree(){
+    var treeID = document.getElementById('selectTree').value;
+    deleteModal.show();
+    document.getElementById('deleteElementId').value = treeID;
+}
+
 //send request to delete root element
 function confirmDeletion(){
     var id = document.getElementById('deleteElementId').value;
+    var select = document.getElementById('selectTree');
+    var event = new Event('change');
+    
+    select.selectedOptions[0].remove();
+
     simple_ajax('trees/delete' , 'post', {'id':id}, 'updateTree' );
-    myModal.hide();
-}
+    deleteModal.hide();
+    console.log(select.options);
+    if(select.options.length > 0){
+        select.selectedIndex=0;
+        select.dispatchEvent(event);
+    }else{
+        simple_ajax('trees/getTreeSelect' , 'post', '', 'updateTreeSelect' );
+    }
 
-
-//create root element on button click
-function createRoot(){
-    simple_ajax('trees/add' , 'post', {'createRoot':true}, 'updateTree' );
 }
 
 function hideAllNameInputs(){
@@ -126,8 +203,15 @@ function hideAllNameInputs(){
 //show rename element input
 function toogleNameInput(id){
     hideAllNameInputs();
-    document.getElementById('info_'+id).style.display = 'none';
-    document.getElementById('edit_'+id).style.display = '';
+    var renameSettings = document.getElementById('settings_rename_modal');
+    if(renameSettings.checked == true){
+        document.querySelector('#renameElementId').value = id;
+        renameModal.show();
+    }else{
+        document.getElementById('info_'+id).style.display = 'none';
+        document.getElementById('edit_'+id).style.display = '';
+    }
+    
 }
 
 
@@ -221,16 +305,22 @@ window.addEventListener('load',function(e){
     openDropdown();
 });
 
-//init modal
-var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+
+/*  /////////////////////// */
+/*  Modals inits and events */
+/*  /////////////////////// */
+
+//init delete modal
+var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'), {
     keyboard: false
 })
 
 //init deletion modal events
 //bind on show function start timer
 var timerId;
-var myModalEl = document.getElementById('myModal')
-myModalEl.addEventListener('show.bs.modal', function (event) {
+var deleteModalEl = document.getElementById('deleteModal')
+
+deleteModalEl.addEventListener('show.bs.modal', function (event) {
     var timer_container = document.getElementById('timer');
     var time = 20;
     timer_container.innerHTML = time;
@@ -245,7 +335,18 @@ myModalEl.addEventListener('show.bs.modal', function (event) {
         }
     },1000);
 })
+
 //bind on hide function clear timer
-myModalEl.addEventListener('hidden.bs.modal', function (event) {
+deleteModalEl.addEventListener('hidden.bs.modal', function (event) {
     clearInterval(timerId);
+})
+
+//init rename modal
+var renameModal = new bootstrap.Modal(document.getElementById('renameModal'), {
+    keyboard: false
+})
+
+//init rename modal
+var createTreeModal = new bootstrap.Modal(document.getElementById('createTreeModal'), {
+    keyboard: false
 })

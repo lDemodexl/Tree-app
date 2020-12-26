@@ -21,7 +21,7 @@
         <div class="navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item active">
-              <a class="nav-link active" href="/task-1/">Main Task</a>
+              <a class="nav-link active" href="/task-1/">Sub Task</a>
             </li>
           </ul>
         </div>

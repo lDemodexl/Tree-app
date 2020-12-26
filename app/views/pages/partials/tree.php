@@ -27,8 +27,10 @@ function buildTreeHtml($data){
 
             $html .= '<span class="addChild" onclick="addChild(this);"><i class="fas fa-plus icon-xs"></i></span>'; 
 
-            $html .= '<span class="removeElement" onclick="deleteElement(this);"><i class="fas fa-trash icon-xs"></i></span></a>';
-            
+            if( !empty($tree['parentID']) ){
+                $html .= '<span class="removeElement" onclick="deleteElement(this);"><i class="fas fa-trash icon-xs"></i></span>';
+            }
+            $html .= '</a>';
             $html .= '<span style="display:none" class="edit-element" id="edit_'.$tree['id'].'">
                 <input type="text" name="'.$tree['id'].'" value="'.$tree['name'].'">
                 <span class="editElement" onclick="editElement(this);"><i class="fas fa-check"></i></span>
