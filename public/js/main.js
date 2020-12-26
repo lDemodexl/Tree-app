@@ -11,6 +11,15 @@ function parseJson(code)
         return code;
     }
 }
+
+/*Helper funcion to get cookie */
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp(
+      "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
 /*
     Function to send ajax request. 
         method - type of request (post/get)
@@ -57,12 +66,14 @@ function simple_ajax(url, method, data, callback = ''){
 function updateTree(data){
     var container = document.getElementById('tree-container');
     container.innerHTML = data;
+    openDropdown();
 }
 
 //add simple element
 function addChild(button){
     var container = button.closest('li');
     var id = container.getAttribute('id');
+    openDropdownOnAdd(id);
     simple_ajax('trees/add' , 'post', {'createChild':id}, 'updateTree' );
 }
 
@@ -70,6 +81,9 @@ function addChild(button){
 function deleteElement(button){
     var container = button.closest('li');
     var id = container.getAttribute('id');
+
+    removeFromCoockie(id);
+
     if(container.classList.contains('root')){
         myModal.show();
         document.getElementById('deleteElementId').value = id;
@@ -91,6 +105,89 @@ function createRoot(){
     simple_ajax('trees/add' , 'post', {'createRoot':true}, 'updateTree' );
 }
 
+//on open/close dropdown resave coockie
+function saveDropdown(input){
+    var coockie = getCookie('dropdown');
+    var name = input.getAttribute('name');
+    var opend_array = [];
+
+    if(!coockie){
+        document.cookie = 'dropdown='+JSON.stringify(opend_array);
+    }else{
+        opend_array = parseJson(decodeURIComponent(coockie));
+    }
+
+    var index = opend_array.indexOf(name);
+
+    if(input.checked){
+        if( index == -1 ){
+            opend_array.push(name); 
+        }
+    }else{
+        opend_array.splice(index, 1);
+    }
+
+    document.cookie = 'dropdown='+encodeURIComponent(JSON.stringify(opend_array));
+}
+
+//remove from coockie if elements are deleted
+function removeFromCoockie(id){
+    var coockie = getCookie('dropdown');
+    if(!coockie){
+        document.cookie = 'dropdown='+JSON.stringify(opend_array);
+    }else{
+        opend_array = parseJson(decodeURIComponent(coockie));
+    }
+
+    var container = document.getElementById('marker_'+id).parentNode;
+    var childs = container.querySelectorAll('input');
+
+    for( var i=0; i<childs.length; i++ ){
+        var index = opend_array.indexOf(childs[i].getAttribute('name'));
+
+        if( index !== -1 ){
+            opend_array.splice(index, 1);
+        }
+        
+    }
+
+    document.cookie = 'dropdown='+encodeURIComponent(JSON.stringify(opend_array));
+}
+
+//open dropdown when new element added to tree
+function openDropdownOnAdd(id){
+    var coockie = getCookie('dropdown');
+    if(!coockie){
+        document.cookie = 'dropdown='+JSON.stringify(opend_array);
+    }else{
+        opend_array = parseJson(decodeURIComponent(coockie));
+    }
+
+    var index = opend_array.indexOf('marker_'+id);
+    if( index == -1 ){
+        opend_array.push('marker_'+id); 
+    }
+    document.cookie = 'dropdown='+encodeURIComponent(JSON.stringify(opend_array));
+}
+
+//open all dropdown from coockie
+function openDropdown(){
+    var coockie = getCookie('dropdown');
+    if(!coockie){
+        document.cookie = 'dropdown='+JSON.stringify(opend_array);
+    }else{
+        opend_array = parseJson(decodeURIComponent(coockie));
+    }
+
+    for( var i=0; i<opend_array.length; i++ ){
+        document.getElementById(opend_array[i]).checked = 'checked';
+    }
+}
+
+//open dropdonw when page loaded
+window.addEventListener('load',function(e){
+    openDropdown();
+});
 
 //init modal
 var myModal = new bootstrap.Modal(document.getElementById('myModal'), {

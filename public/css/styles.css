@@ -30,13 +30,22 @@
     border-bottom: 1px solid;
 }
 
+
+
 .child > span a{
     position: relative;
     top:0.5rem;
-    left:1rem;
+    left:1.5rem;
     background:white;
 }
-
+.child >.marker{
+    position: relative;
+    width: 0;
+    margin: 0;
+    left:0.9rem;
+    background:white;
+    top: 0.6rem;
+}
 .root > span{
     border:none;
 }
@@ -48,12 +57,14 @@
 .root > ul > li > span:first-child{
     border-left: 1px;
 }
-.root > ul > li{
-    padding-left:0
+.root > ul, .root > ul > li{
+    padding-left:0;
+    margin-left:2px;
 }
 
 ul > li:last-child > ul:last-child > li{
     border-left: none; 
+    margin:none;
 }
 ul > li:last-child > ul:last-child > li > span{
     border-left: 1px solid; 
@@ -91,22 +102,28 @@ ul li ul li {
 li.last {
     border: none;  
 }
-.marker { 
-    background-color: #fff;
-    border-color:  transparent transparent  transparent #666;
-    border-style: solid; 
-    border-width: .25em 0 .25em .5em;   
-    display: block;
-    height: 0;
-    margin: .35em .25em 0 0; 
-    float: left; 
-    width: 0; 
-    height: 0; 
-    line-height: 0;
+
+
+
+.marker::before{
+    content: "\f105";
+    background:white;
 }
-.marker.open {
-    border-color: #999 transparent transparent transparent;
-    border-width: .6em .25em 0 .25em;  
+
+input:checked + label::before{
+    content: "\f107";
+}
+input:checked ~ ul{
+    display:inherit;
+}
+
+.hidden{
+    display:none;
+    visibility: hidden;
+}
+
+.parent > ul {
+    display:none;
 }
 
 #timer{
