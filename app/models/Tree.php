@@ -6,6 +6,7 @@ class Tree{
 		$this->db = new DataBase;
 	}
 	
+	//get all records from  tree table
 	public function getTree(){
 		$this->db->query('SELECT *
 						FROM tree
@@ -15,6 +16,7 @@ class Tree{
 		return $this->db->resultSetAll();
 	}
 
+	//add root to tree
 	public function AddTreeRoot(){
 		$this->db->query('INSERT INTO tree (name, parentID) VALUES (:name, :parentID)');
 		$this->db->bind(':name', 'root');
@@ -29,6 +31,7 @@ class Tree{
 
 	}
 
+	//add element to tree
 	public function AddTreeChild($id){
 		$this->db->query('INSERT INTO tree (name, parentID) VALUES (:name, :parentID)');
 		$this->db->bind(':name', 'new branch');
@@ -43,6 +46,7 @@ class Tree{
 
 	}
 
+	//delete element from tree
 	public function deleteElement($id){
 		$this->db->query('DELETE FROM tree WHERE id = :id');
 		$this->db->bind(':id', $id);
@@ -53,6 +57,28 @@ class Tree{
 		}else{
 			return false;
 		}
+	}
+
+	//Check if element has childs
+	public function isParent($id){
+		$this->db->query('SELECT * FROM tree WHERE parentID = :id');
+		$this->db->bind(':id', $id);
+		//Execute
+		$this->db->execute();
+
+		if( $this->db->rowCount() > 0 ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	//Select all childs of element
+	public function getChilds($id){
+		$this->db->query('SELECT * FROM tree WHERE parentID = :id');
+		$this->db->bind(':id', $id);
+
+		return $this->db->resultSetAll();
 	}
 }
 ?>

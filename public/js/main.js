@@ -52,23 +52,21 @@ function simple_ajax(url, method, data, callback = ''){
     r.send(formData);
     
 }
-var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
-    keyboard: false
-})
 
-
-  
+//replace old tree with new one
 function updateTree(data){
     var container = document.getElementById('tree-container');
     container.innerHTML = data;
 }
 
+//add simple element
 function addChild(button){
     var container = button.closest('li');
     var id = container.getAttribute('id');
     simple_ajax('trees/add' , 'post', {'createChild':id}, 'updateTree' );
 }
 
+//check if root show confirmation else send request to delete element
 function deleteElement(button){
     var container = button.closest('li');
     var id = container.getAttribute('id');
@@ -80,6 +78,7 @@ function deleteElement(button){
     }
 }
 
+//send request to delete root element
 function confirmDeletion(){
     var id = document.getElementById('deleteElementId').value;
     simple_ajax('trees/delete' , 'post', {'id':id}, 'updateTree' );
@@ -91,6 +90,15 @@ function confirmDeletion(){
 function createRoot(){
     simple_ajax('trees/add' , 'post', {'createRoot':true}, 'updateTree' );
 }
+
+
+//init modal
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
+    keyboard: false
+})
+
+//init deletion modal events
+//bind on show function start timer
 var timerId;
 var myModalEl = document.getElementById('myModal')
 myModalEl.addEventListener('show.bs.modal', function (event) {
@@ -108,6 +116,7 @@ myModalEl.addEventListener('show.bs.modal', function (event) {
         }
     },1000);
 })
+//bind on hide function clear timer
 myModalEl.addEventListener('hidden.bs.modal', function (event) {
     clearInterval(timerId);
 })
